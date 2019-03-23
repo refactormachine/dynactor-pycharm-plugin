@@ -1,0 +1,47 @@
+<idea-plugin>
+    <id>com.dynactor.dynactor</id>
+    <name>Dynactor</name>
+    <vendor email="refactormachine@gmail.com" url="http://www.refactormachine.com">RefactorMachine</vendor>
+
+    <description><![CDATA[
+    Refactor and validate your code correctness by dynamic analysis
+    of program execution.<br>
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <!-- TODO: enable only in PyCharm and not in all products -->
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>com.intellij.modules.python</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!--<group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">-->
+            <!--<add-to-group group-id="MainMenu" anchor="last"/>-->
+            <!--<action id="Myplugin.Textboxes" class="logic.HelloAction" text="Hello" description="Says hello"/>-->
+        <!--</group>-->
+
+        <group id="MyPlugin.Another" text="_Dynactor">
+            <add-to-group group-id="MainMenu"/>
+            <action id="MyPlugin.TakeSnapshot" class="logic.HelloAction" text="_Start refactoring" description="Snapshot the current state of the code. Allows to validate code modification."
+                    icon="AllIcons.Actions.RefactoringBulb">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift ["/>
+            </action>
+            <action id="MyPlugin.ResetSnapshot" class="logic.HelloAction" text="_Restart refactoring" description="Forget previous snapshot, take snapshot from current state of the code."
+                    icon="AllIcons.Actions.RefactoringBulb">
+            </action>
+            <action id="MyPlugin.CompareToSnapshot" class="logic.HelloAction" text="_Check refactoring" description="Validate that code modification does not imply significant difference in program execution."
+                    icon="AllIcons.Nodes.Jsf.Validator">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift ]"/>
+            </action>
+        </group>
+    </actions>
+    <idea-version since-build="183" until-build="192.*"/> <!-- any 162-based version, 162.94, 162.94.11, etc.-->
+</idea-plugin>

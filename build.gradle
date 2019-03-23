@@ -1,0 +1,78 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        jcenter()
+//        maven { url 'http://repo1.maven.org/maven2' }
+    }
+}
+
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.2'
+}
+
+sourceCompatibility = 1.8
+
+allprojects{
+    repositories {
+            mavenCentral()
+            google()
+            jcenter()
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+
+
+group 'com.dynactor'
+version '0.1'
+
+sourceCompatibility = 1.8
+
+compileJava{
+    File generatedSourceDir = project.file("src/main/generated")
+    println "Creating and configuring generated source directory $generatedSourceDir"
+    project.mkdir(generatedSourceDir)
+    options.annotationProcessorGeneratedSourcesDirectory = generatedSourceDir
+    outputs.dir(generatedSourceDir)
+
+    doFirst {
+        // force a clean of generatedSourceDir to prevent java.lang.IllegalStateException: endPosTable already set. This shouldn't be need if using Gradle 4.8+ or Java 9+.
+        project.delete(generatedSourceDir)
+        project.mkdir(generatedSourceDir)
+    }
+}
+
+dependencies {
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
+    annotationProcessor             "com.google.auto.value:auto-value:1.6"
+    compile             "com.google.auto.value:auto-value:1.6"
+    compileOnly         "com.google.auto.value:auto-value:1.6"
+    compileOnly         "com.google.auto.value:auto-value-annotations:1.6"
+    testCompile         "com.google.auto.value:auto-value-annotations:1.6"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile "org.mockito:mockito-core:2.+"
+
+    // https://mvnrepository.com/artifact/com.github.wumpz/diffutils
+    compile group: 'com.github.wumpz', name: 'diffutils', version: '2.2'
+}
+
+intellij {
+    version '2018.3'
+    pluginName 'dynactor'
+    alternativeIdePath '/home/bugabuga/.local/share/JetBrains/Toolbox/apps/PyCharm-C/ch-0/183.5912.18'
+//    plugins 'PythonCore:2018.3.183.5912.2'
+    downloadSources true
+}
+
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}
