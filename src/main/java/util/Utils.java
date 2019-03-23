@@ -1,9 +1,16 @@
 package util;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -40,6 +47,24 @@ public class Utils {
             return elements.toArray(names);
         }
 
+    }
+
+    public static void sendHttpsPost(String httpsURL, StringEntity json) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(httpsURL);
+        post.setHeader("Authorization", "Basic Sisi");
+        post.addHeader("content-type", "application/json");
+        post.addHeader("Accept","application/json");
+        post.setEntity(json);
+
+        HttpResponse response = client.execute(post);
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        StringBuilder result = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        System.out.println("result = " + result);
     }
 
     // TODO(bugabuga): figure out how it works with Chinese.

@@ -1,29 +1,9 @@
 package gui;
 
-import logic.RefactoringApplier;
-import logic.RefactoringSuggestion;
-
 import javax.swing.*;
 
 public class PanelPresentor {
-    private static JPanel createSampleMenuPanel() {
-        RefactoringSuggestion r = RefactoringSuggestion.exampleRefactoringSuggestion("someRefactoring");
-        RefactoringView demo = new RefactoringView(
-                r,
-                new SillyDiffsViewer());
-        String root = "/tmp";
-        final int[] i = {0};
-        demo.setOperations(new RefactoringApplier(r, root),
-                ()->{
-                    System.out.println("next");
-                    i[0]++;
-                    RefactoringSuggestion newR = RefactoringSuggestion.exampleRefactoringSuggestion(String.valueOf(i[0]));
-                    demo.setCurrentRefactoring(newR);
-                },
-                ()->{System.out.println("previous");},
-                ()->{System.out.println("reject");});
-        return demo.getPanel();
-    }
+
 
     public static void main(String[] args) {
         try {
@@ -35,7 +15,7 @@ public class PanelPresentor {
         SwingUtilities.invokeLater(() -> {
             JFrame f = new JFrame("JPanel Demo");
 
-            f.add(createSampleMenuPanel());
+//            f.add();
 
             f.pack();
             f.setLocationRelativeTo(null);

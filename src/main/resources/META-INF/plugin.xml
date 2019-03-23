@@ -25,19 +25,19 @@
     <actions>
         <!--<group id="MyPlugin.SampleMenu" text="Greeting" description="Greeting menu">-->
             <!--<add-to-group group-id="MainMenu" anchor="last"/>-->
-            <!--<action id="Myplugin.Textboxes" class="logic.HelloAction" text="Hello" description="Says hello"/>-->
+            <!--<action id="Myplugin.Textboxes" class="validateRefactoring.HelloAction" text="Hello" description="Says hello"/>-->
         <!--</group>-->
 
         <group id="MyPlugin.Another" text="_Dynactor">
             <add-to-group group-id="MainMenu"/>
-            <action id="MyPlugin.TakeSnapshot" class="logic.HelloAction" text="_Start refactoring" description="Snapshot the current state of the code. Allows to validate code modification."
+            <action id="MyPlugin.TakeSnapshot" class="actions.StartRefactoringAction" text="_Start refactoring" description="Snapshot the current state of the code. Allows to validate code modification."
                     icon="AllIcons.Actions.RefactoringBulb">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift ["/>
             </action>
-            <action id="MyPlugin.ResetSnapshot" class="logic.HelloAction" text="_Restart refactoring" description="Forget previous snapshot, take snapshot from current state of the code."
+            <action id="MyPlugin.ResetSnapshot" class="actions.StartRefactoringAction" text="_Restart refactoring" description="Forget previous snapshot, take snapshot from current state of the code."
                     icon="AllIcons.Actions.RefactoringBulb">
             </action>
-            <action id="MyPlugin.CompareToSnapshot" class="logic.HelloAction" text="_Check refactoring" description="Validate that code modification does not imply significant difference in program execution."
+            <action id="MyPlugin.CompareToSnapshot" class="actions.ValidateAction" text="_Check refactoring" description="Validate that code modification does not imply significant difference in program execution."
                     icon="AllIcons.Nodes.Jsf.Validator">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift ]"/>
             </action>
