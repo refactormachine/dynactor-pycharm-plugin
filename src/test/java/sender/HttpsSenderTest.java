@@ -1,5 +1,9 @@
 package sender;
 
+
+import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
 import com.sun.net.httpserver.*;
 import org.junit.*;
 import org.junit.Assert;
@@ -7,45 +11,67 @@ import util.Utils;
 
 import javax.net.ssl.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 
 
 
 public class HttpsSenderTest {
-
     public static final String MY_KEYSTORE_FNAME = "my_keystore.keystore";
+    static final int PORT = 8801;
+    private List<JSONObject> messagesReceived = new ArrayList<>();
+    private String erroneousMessage = "";
+
+    @Before
+    public void setupServer(){
+        messagesReceived.clear();
+        erroneousMessage = "";
+        listenOnPort(PORT);
+    }
+
 
     @Test
     public void testSendMessage(){
-        int port = 8801;
-        listenOnPort(port);
-
-        String url = String.format("https://localhost:%d/foo", port);
+        String url = String.format("https://localhost:%d/foo", PORT);
         HttpsSender s = new HttpsSender(url, "goo:do");
-        s.sendMessage("moshe", "content");
-
-//        assert getMessgeKind() == "moshe" && getMessageContent == "content";
+        s.sendMessage("moshe", "content123");
+        Assert.assertEquals("Bad request: " + erroneousMessage, erroneousMessage, "");
+        JSONObject expected = Utils.createMessageJSON("moshe", "content123");
+        Assert.assertEquals(1, messagesReceived.size());
+        Assert.assertEquals(expected, messagesReceived.get(0));
     }
 
 
 
     private void listenOnPort(int port) {
-        Server s = new Server(port, request -> {
-//            try {
-//                String content = Utils.readStream(request.getRequestBody());
-//                return content;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-            return "response";
-        });
+        Server s = new Server(port, this::handleRequest);
+        URL keystoreURL = getUrl();
+        s.listen(keystoreURL);
+    }
+
+    private String handleRequest(HttpExchange request) {
+        String content = "";
+        try {
+            content = Utils.readStream(request.getRequestBody());
+            Object obj = new JSONParser().parse(content);
+            messagesReceived.add((JSONObject) obj);
+            return "good";
+        } catch (IOException e) {
+            assert false;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            erroneousMessage = content;
+        }
+        return "bad";
+    }
+
+    @NotNull
+    private URL getUrl() {
         ClassLoader clsLoader = getClass().getClassLoader();
         String setupScriptPath = clsLoader.getResource("setup_truststore.sh").getPath();
         String resourcesBase = new File(setupScriptPath).getParent();
@@ -56,8 +82,7 @@ public class HttpsSenderTest {
                 "\tcd " + resourcesBase + "\n" +
                 "\tsource setup_truststore.sh";
         Assert.assertNotNull(errorMessage, keystoreURL);
-
-        s.listen(keystoreURL);
+        return keystoreURL;
     }
 }
 interface SimpleHandler{

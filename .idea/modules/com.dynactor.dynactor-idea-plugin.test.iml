@@ -21,6 +21,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="module-library">
       <library name="Gradle: com.jetbrains:ideaIC:2018.3">
         <CLASSES>

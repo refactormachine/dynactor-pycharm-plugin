@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,19 +47,9 @@ public class HttpsSender implements Sender{
 
     @Override
     public void sendMessage(String command, String content) {
-        String encodedContent = new String(Base64.encodeBase64(content.getBytes()));
-        StringEntity message;
+        String message = Utils.createMessageJSON(command, content).toString();
         try {
-            message = new StringEntity(String.format(
-                    "message={\"command\":\"%s\",\"content\":\"%s\"} ",
-                    command, encodedContent));
-        } catch (UnsupportedEncodingException e) {
-            assert false;
-            e.printStackTrace();
-            return;
-        }
-        try {
-            httpsPost(message);
+            httpsPost(new StringEntity(message));
         } catch (IOException e) {
             e.printStackTrace();
         }

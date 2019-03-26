@@ -1,5 +1,6 @@
 package util;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -7,6 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -105,7 +107,18 @@ public class Utils {
 
     public static String readStream(InputStream requestBody) throws IOException {
         StringWriter writer = new StringWriter();
-        IOUtils.copy(requestBody, writer, "base64");
+        IOUtils.copy(requestBody, writer, "UTF-8");
         return writer.toString();
+    }
+
+    public static String toBase64(String string) {
+        return new String(Base64.encodeBase64(string.getBytes()));
+    }
+
+    public static org.json.simple.JSONObject createMessageJSON(String command, String content) {
+            JSONObject expected = new JSONObject();
+            expected.put("command", command);
+            expected.put("content", Utils.toBase64(content));
+            return expected;
     }
 }

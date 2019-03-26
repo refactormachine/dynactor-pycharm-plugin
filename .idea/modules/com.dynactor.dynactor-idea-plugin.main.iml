@@ -11,6 +11,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.google.auto.value:auto-value:1.6" level="project" />
     <orderEntry type="library" name="Gradle: com.github.wumpz:diffutils:2.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
@@ -20,8 +21,10 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:4.10" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.google.auto.value:auto-value-annotations:1.6" level="project" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library name="Gradle: com.jetbrains:ideaIC:2018.3">
         <CLASSES>
           <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2018.3/6edb21dc38f8114a1ac506d6bea87fcf85955a6/ideaIC-2018.3/lib/util-2.2.1.jar!/" />
