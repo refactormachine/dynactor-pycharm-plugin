@@ -1,5 +1,6 @@
 package util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -47,24 +48,6 @@ public class Utils {
             return elements.toArray(names);
         }
 
-    }
-
-    public static void sendHttpsPost(String httpsURL, StringEntity json) throws IOException {
-        HttpClient client = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(httpsURL);
-        post.setHeader("Authorization", "Basic Sisi");
-        post.addHeader("content-type", "application/json");
-        post.addHeader("Accept","application/json");
-        post.setEntity(json);
-
-        HttpResponse response = client.execute(post);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        StringBuilder result = new StringBuilder();
-        String line;
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
-        }
-        System.out.println("result = " + result);
     }
 
     // TODO(bugabuga): figure out how it works with Chinese.
@@ -118,5 +101,11 @@ public class Utils {
             newContent2 = "class A{\n    void foo(){}\n}";
         }
         return newContent2;
+    }
+
+    public static String readStream(InputStream requestBody) throws IOException {
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(requestBody, writer, "base64");
+        return writer.toString();
     }
 }

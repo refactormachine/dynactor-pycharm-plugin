@@ -33,3 +33,7 @@ gradle/
 # Generated java files
 generated/
 generated_tests/
+
+# Avoid mistakenly uploading keystores and certificates to git
+*.crt
+*.keystore

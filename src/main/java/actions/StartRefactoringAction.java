@@ -3,10 +3,10 @@ package actions;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import org.apache.commons.codec.binary.Base64;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.SystemIndependent;
-import util.Utils;
+import sender.HttpsSender;
+import sender.Sender;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,15 +29,17 @@ public class StartRefactoringAction extends AnAction {
     }
 
     public static void startOperation(@SystemIndependent String basePath) {
-        FilesSender sender = new FilesSender(basePath, ".py");
-        new Thread(sender).start();
+        Sender sender = new HttpsSender(
+                "http://localhost:8891/message","moshe:moshe");
+        FilesSender filesSender = new FilesSender(sender, basePath, ".py");
+        new Thread(filesSender).start();
         StartDialog dialog = new StartDialog();
-        sender.setUpdateFunc(dialog::updateProcessBar);
+        filesSender.setUpdateFunc(dialog::updateProcessBar);
         boolean result = dialog.showAndGet();
         if(result) {
             RefactoringState.getInstance().setOngoing();
         }else{
-            sender.abort();
+            filesSender.abort();
         }
     }
 
