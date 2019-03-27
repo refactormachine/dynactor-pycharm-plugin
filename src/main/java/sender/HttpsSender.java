@@ -1,17 +1,16 @@
 package sender;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.simple.JSONObject;
 import util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 public class HttpsSender implements Sender{
     private final String httpsURL;
@@ -46,13 +45,12 @@ public class HttpsSender implements Sender{
     }
 
     @Override
-    public void sendMessage(String command, String content) {
-        String message = Utils.createMessageJSON(command, content).toString();
+    public void sendMessage(JSONObject message) {
+        String messageString = message.toString();
         try {
-            httpsPost(new StringEntity(message));
+            httpsPost(new StringEntity(messageString));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

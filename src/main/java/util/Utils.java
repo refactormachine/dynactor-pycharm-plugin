@@ -1,6 +1,5 @@
 package util;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -14,6 +13,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -112,13 +112,27 @@ public class Utils {
     }
 
     public static String toBase64(String string) {
-        return new String(Base64.encodeBase64(string.getBytes()));
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
-    public static org.json.simple.JSONObject createMessageJSON(String command, String content) {
+    public static org.json.simple.JSONObject createFileMessage(
+            String relativePath, String content) {
+        JSONObject expected = new JSONObject();
+        expected.put("command", "uploadFile");
+        expected.put("relativePath", Utils.toBase64(relativePath));
+        expected.put("content", Utils.toBase64(content));
+        return expected;
+    }
+
+    public static org.json.simple.JSONObject createCommandMessage(String command) {
             JSONObject expected = new JSONObject();
             expected.put("command", command);
-            expected.put("content", Utils.toBase64(content));
             return expected;
+    }
+
+    public static String fromBase64(String encodedString) {
+        byte[] bytes = java.util.Base64.getDecoder().decode(encodedString);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }

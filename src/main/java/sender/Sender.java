@@ -1,5 +1,7 @@
 package sender;
 
+import org.json.simple.JSONObject;
+
 public interface Sender {
-    void sendMessage(String message, String content);
+    void sendMessage(JSONObject message);
 }

@@ -24,20 +24,24 @@ public class FilesSender implements Runnable{
     @Override
     public void run() {
         List<String> filesToUpload = findAllFiles(root, suffix);
-        sender.sendMessage("resetFiles", "");
+        sender.sendMessage(Utils.createCommandMessage("resetFiles"));
         for(int i = 0; i < filesToUpload.size(); ++i){
             if(aborted){
-                sender.sendMessage("abort", "");
+                sender.sendMessage(Utils.createCommandMessage("abort"));
                 return;
             }
             String filename = filesToUpload.get(i);
             try {
-                sender.sendMessage("uploadFile", Utils.readFileContent(filename));
+                sender.sendMessage(Utils.createFileMessage(
+                        Utils.relativePath(root, filename),
+                        Utils.readFileContent(filename)
+                ));
             } catch (IOException e) {
                 e.printStackTrace();
             }
             updateProgress(i / (double)filesToUpload.size());
         }
+        sender.sendMessage(Utils.createCommandMessage("done"));
         updateProgress(1.0);
     }
 
