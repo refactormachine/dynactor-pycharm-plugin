@@ -6,6 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import util.Utils;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -43,10 +44,15 @@ public class ConfigFactory {
     }
 
     public PluginConfig readDefaultProjectConfig(String projectRoot) throws IOException, ParseException {
-        return readJSONFile(Paths.get(projectRoot, DEFAULT_CONFIG_FILENAME).toString());
+        File config = Paths.get(projectRoot, DEFAULT_CONFIG_FILENAME).toFile();
+        if(config.exists() && config.isFile()) {
+            return readJSONFile(config);
+        }else{
+            return defaultConfig();
+        }
     }
 
-    public PluginConfig readJSONFile(String configPath) throws IOException, ParseException {
+    public PluginConfig readJSONFile(File configPath) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
         Object obj = parser.parse(new FileReader(configPath));
         return fromJSON((JSONObject)obj);

@@ -5,14 +5,18 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import util.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class HttpsSender implements Sender{
+    public static final String ERROR_RESPONSE = "!Error!";
     private final String httpsURL;
     private final String authorization;
 
@@ -21,27 +25,22 @@ public class HttpsSender implements Sender{
         this.authorization = authorization;
     }
 
-    private void httpsPost(StringEntity json) throws IOException {
+    private String httpsPost(StringEntity json) throws IOException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(httpsURL);
         post.setHeader("Authorization", authorization);
         post.addHeader("content-type", "application/json");
         post.addHeader("Accept","application/json");
         post.setEntity(json);
-        HttpResponse response = null;
+        HttpResponse response;
         try {
              response = client.execute(post);
         }catch(Exception e){
             e.printStackTrace();
+            return ERROR_RESPONSE;
         }
-
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        StringBuilder result = new StringBuilder();
-        String line;
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
-        }
-        System.out.println("result = " + result);
+        InputStream x = response.getEntity().getContent();
+        return Utils.readStream(x, StandardCharsets.UTF_8);
     }
 
     @Override

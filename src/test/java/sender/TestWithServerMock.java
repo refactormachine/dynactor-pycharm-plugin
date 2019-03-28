@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -92,7 +93,7 @@ public abstract class TestWithServerMock {
     private String handleRequest(HttpExchange request) {
         String content = "";
         try {
-            content = Utils.readStream(request.getRequestBody());
+            content = Utils.readStream(request.getRequestBody(), StandardCharsets.UTF_8);
             Object obj = new JSONParser().parse(content);
             List<String> auth = request.getRequestHeaders().get("Authorization");
             String authString = "";

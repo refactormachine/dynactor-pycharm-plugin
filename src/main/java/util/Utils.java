@@ -14,6 +14,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -112,9 +113,9 @@ public class Utils {
         return newContent2;
     }
 
-    public static String readStream(InputStream requestBody) throws IOException {
+    public static String readStream(InputStream requestBody, Charset encoding) throws IOException {
         StringWriter writer = new StringWriter();
-        IOUtils.copy(requestBody, writer, "UTF-8");
+        IOUtils.copy(requestBody, writer, encoding);
         return writer.toString();
     }
 

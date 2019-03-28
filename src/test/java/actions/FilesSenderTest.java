@@ -39,7 +39,7 @@ public class FilesSenderTest extends TestWithServerMock {
             String content = Utils.fromBase64((String) message.get("content"));
             ;
             String relativePath = Utils.fromBase64((String) message.get("relativePath"));
-            Assert.assertTrue(expectedPathsAndContents.containsKey(relativePath));
+            Assert.assertTrue(relativePath, expectedPathsAndContents.containsKey(relativePath));
             Assert.assertEquals(expectedPathsAndContents.get(relativePath), content);
         }
     }
@@ -65,15 +65,9 @@ public class FilesSenderTest extends TestWithServerMock {
 
         Sender sender = createSender();
         FilesSender filesSender = new FilesSender(sender, tempDir.getAbsolutePath(),
-                new FilesFinder() {
-                    @Override
-                    public List<String> findAllFiles(String root) throws IOException {
-                        List<String> x = filesSpec.keySet().stream().filter(s -> !s.equals("do_not_send_me")).collect(Collectors.toList());
-                        return x;
-                    }
-                });
+                root -> filesSpec.keySet().stream().filter(s -> !s.equals("do_not_send_me")).map(s-> Paths.get(root, s).toString()).collect(Collectors.toList()));
         filesSender.run();
-
+        filesSpec.remove("do_not_send_me");
         assertFilesSent(filesSpec);
 
         FileUtils.deleteDirectory(tempDir);
