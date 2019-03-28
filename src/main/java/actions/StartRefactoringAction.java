@@ -10,13 +10,12 @@ import config.PluginConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.SystemIndependent;
 import org.json.simple.parser.ParseException;
+import sender.FilesFinder;
 import sender.HttpsSender;
 import sender.Sender;
-import util.FilesFinder;
-import util.PythonicFilesFinder;
+import util.Utils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -26,6 +25,14 @@ public class StartRefactoringAction extends AnAction {
 
     public static final String PASSWORD = "moshe:moshe";
 
+    private static void run(String basePath) {
+        try {
+            startOperation(basePath);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
@@ -34,25 +41,22 @@ public class StartRefactoringAction extends AnAction {
         }
         System.out.println("Sync with server...");
         @SystemIndependent String basePath = project.getBasePath();
-        try {
-            startOperation(basePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        run(basePath);
     }
 
     public static void startOperation(@SystemIndependent String basePath) throws IOException, ParseException {
-        PluginConfig config = new ConfigFactory().readDefaultProjectConfig(basePath);
+        PluginConfig config = new ConfigFactory().readProjectConfig(basePath);
         Sender sender = new HttpsSender(
                 String.format("http://%s:%d/message", config.serverAddress, config.serverPort), PASSWORD);
-        FilesFinder finder = new PythonicFilesFinder(config.uploadIgnoreList);
+        sendFiles(basePath, config, sender);
+    }
+
+    private static void sendFiles(@SystemIndependent String basePath, PluginConfig config, Sender sender) {
+        FilesFinder finder = config.createFinder();
         StartDialog dialog = new StartDialog();
         FilesSender filesSender = new FilesSender(sender, basePath, finder);
         filesSender.setErrorCallback(s->{
-            dialog.close(DialogWrapper.CLOSE_EXIT_CODE);
-            Messages.showErrorDialog(s, "Files Synch Error");
+            dialog.updateMessage("Error:\n" + s);
         });
         filesSender.setUpdateFunc(dialog::updateProcessBar);
         filesSender.setDoneFunc(()-> dialog.setOKActionEnabled(true));
@@ -65,23 +69,13 @@ public class StartRefactoringAction extends AnAction {
         }
     }
 
-    public static void main(String[] argv) throws IOException {
+    public static void main(String[] argv) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        EventQueue.invokeLater(
-                ()-> {
-                    try {
-                        startOperation("/home/bugabuga/sample");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
-        );
+        SwingUtilities.invokeLater(() -> run("/home/bugabuga/sample"));
     }
 
     @Override

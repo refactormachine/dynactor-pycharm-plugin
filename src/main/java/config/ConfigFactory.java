@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class ConfigFactory {
-    private static final String DEFAULT_CONFIG_FILENAME = ".dynactor_plugin_config";
+    private static final String CONFIG_FILENAME = ".dynactor_plugin_config";
 
     public PluginConfig defaultConfig(){
         PluginConfig config = new PluginConfig();
@@ -43,8 +43,8 @@ public class ConfigFactory {
         return config;
     }
 
-    public PluginConfig readDefaultProjectConfig(String projectRoot) throws IOException, ParseException {
-        File config = Paths.get(projectRoot, DEFAULT_CONFIG_FILENAME).toFile();
+    public PluginConfig readProjectConfig(String projectRoot) throws IOException, ParseException {
+        File config = Paths.get(projectRoot, CONFIG_FILENAME).toFile();
         if(config.exists() && config.isFile()) {
             return readJSONFile(config);
         }else{
@@ -57,4 +57,5 @@ public class ConfigFactory {
         Object obj = parser.parse(new FileReader(configPath));
         return fromJSON((JSONObject)obj);
     }
+
 }

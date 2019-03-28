@@ -1,11 +1,14 @@
 package actions;
 
+import config.ConfigFactory;
+import config.PluginConfig;
+import org.json.simple.parser.ParseException;
+import sender.Commands;
 import sender.Sender;
-import util.FilesFinder;
+import sender.FilesFinder;
 import util.Utils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -26,52 +29,52 @@ public class FilesSender implements Runnable {
 
     @Override
     public void run() {
+        update.accept(0.0);
+        PluginConfig config = null;
+        try {
+            config = new ConfigFactory().readProjectConfig(root);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+            errorCallback.accept("Cannot load config");
+            return;
+        }
         List<String> filesToUpload;
         try {
             filesToUpload = finder.findAllFiles(root);
         } catch (IOException e) {
-            errorCallback.accept(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
+            errorCallback.accept("Cannot find files to upload");
             return;
         }
-        sender.sendMessage(Utils.createCommandMessage("resetFiles"));
-        for (int i = 0; i < filesToUpload.size(); ++i) {
-            if (aborted) {
-                sender.sendMessage(Utils.createCommandMessage("abort"));
-                return;
-            }
-            String filename = filesToUpload.get(i);
-            try {
-                sender.sendMessage(Utils.createFileMessage(
+        try {
+            sender.sendMessage(Commands.resetCommand());
+            for (int i = 0; i < filesToUpload.size(); ++i) {
+                if (aborted) {
+                    sender.sendMessage(Commands.abortCommand());
+                    return;
+                }
+                String filename = filesToUpload.get(i);
+                sender.sendMessage(Commands.uploadFileCommand(
                         Utils.relativePath(root, filename),
                         Utils.readFileContent(filename)
                 ));
-            } catch (IOException e) {
-                e.printStackTrace();
+                update.accept(i / (double) filesToUpload.size());
             }
-            updateProgress(i / (double) filesToUpload.size());
+            sender.sendMessage(Commands.doneCommand());
+        } catch (IOException e) {
+            e.printStackTrace();
+            errorCallback.accept("Failed to upload files to server");
+            return;
         }
-        sender.sendMessage(Utils.createCommandMessage("done"));
-        updateProgress(1.0);
-        done();
-    }
-
-    private void done() {
-        if (doneCallback != null) {
-            doneCallback.run();
-        }
-    }
-
-    private void updateProgress(double percent) {
-        if (update != null) {
-            update.accept(percent);
-        }
+        update.accept(1.0);
+        doneCallback.run();
     }
 
     public void setUpdateFunc(Consumer<Double> updateProcessBar) {
         this.update = updateProcessBar;
     }
 
-    public void setErrorCallback(Consumer<String> errorCallback){
+    public void setErrorCallback(Consumer<String> errorCallback) {
         this.errorCallback = errorCallback;
     }
 

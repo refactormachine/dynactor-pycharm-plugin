@@ -2,6 +2,8 @@ package util;
 
 import com.intellij.openapi.util.io.FileUtil;
 import org.junit.Test;
+import sender.FindSmallFiles;
+import sender.PythonicFilesFinder;
 
 import java.io.File;
 import java.io.IOException;

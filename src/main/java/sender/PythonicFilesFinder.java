@@ -1,4 +1,6 @@
-package util;
+package sender;
+
+import util.Utils;
 
 import java.io.*;
 import java.util.ArrayList;

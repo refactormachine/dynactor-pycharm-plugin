@@ -9,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import util.Utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class HttpsSender implements Sender{
@@ -32,24 +29,14 @@ public class HttpsSender implements Sender{
         post.addHeader("content-type", "application/json");
         post.addHeader("Accept","application/json");
         post.setEntity(json);
-        HttpResponse response;
-        try {
-             response = client.execute(post);
-        }catch(Exception e){
-            e.printStackTrace();
-            return ERROR_RESPONSE;
-        }
+        HttpResponse response = client.execute(post);
         InputStream x = response.getEntity().getContent();
         return Utils.readStream(x, StandardCharsets.UTF_8);
     }
 
     @Override
-    public void sendMessage(JSONObject message) {
+    public void sendMessage(JSONObject message) throws IOException {
         String messageString = message.toString();
-        try {
-            httpsPost(new StringEntity(messageString));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        httpsPost(new StringEntity(messageString));
     }
 }

@@ -1,12 +1,11 @@
 package sender;
 
 
-import com.intellij.openapi.util.Pair;
 import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-import util.Utils;
 
+import java.io.IOException;
 
 
 public class HttpsSenderTest extends TestWithServerMock{
@@ -16,9 +15,9 @@ public class HttpsSenderTest extends TestWithServerMock{
     }
 
     @Test
-    public void testSendMessage(){
+    public void testSendMessage() throws IOException {
         Sender s = createSender();
-        JSONObject message = Utils.createCommandMessage("cmd1");
+        JSONObject message = Commands.createCommandMessage("cmd1");
         s.sendMessage(message);
         Assert.assertEquals("Bad request: " + getErroneousMessage(), getErroneousMessage(), "");
         Assert.assertEquals(1, getMessagesReceived().size());

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiUtils {
+    // direction is one of BoxLayout.X_AXIS, BoxLayout.Y_AXIS BoxLayout.LINE_AXIS, BoxLayout.PAGE_AXIS
     public static JPanel spacedElementsInBox(Iterable<Component> elements, int direction, Dimension margin){
         JPanel panel = new JPanel();
         setSpacedBoxLayout(elements, direction, margin, panel);

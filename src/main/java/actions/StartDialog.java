@@ -1,16 +1,18 @@
 package actions;
 
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.ui.GuiUtils;
+import com.intellij.ui.components.JBLabel;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class StartDialog extends DialogWrapper {
 
     private JProgressBar progressBar;
+    private JBLabel messageLabel;
 
     public StartDialog() {
         super(true); // use current window as parent
@@ -22,17 +24,14 @@ public class StartDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel dialogPanel = new JPanel(new BorderLayout());
-
         progressBar = new JProgressBar(0, 100);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
 
-        JLabel label = new JLabel("testing");
-        label.setPreferredSize(new Dimension(100, 100));
-        dialogPanel.add(label, BorderLayout.CENTER);
-        dialogPanel.add(progressBar);
-        return dialogPanel;
+        messageLabel = new JBLabel("Uploading files...");
+
+        return gui.GuiUtils.elementsInBox(Arrays.asList(messageLabel, progressBar),
+                BoxLayout.Y_AXIS);
     }
 
     public void updateProcessBar(double percent){
@@ -41,8 +40,7 @@ public class StartDialog extends DialogWrapper {
         }
     }
 
-    public void enableDone() {
-        setOKActionEnabled(true);
+    public void updateMessage(String message) {
+        messageLabel.setText(message);
     }
-
 }

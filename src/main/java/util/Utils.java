@@ -1,5 +1,7 @@
 package util;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,6 +13,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.swing.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.URL;
@@ -25,12 +28,12 @@ public class Utils {
     public static final String FILE_SUFFIX = getFileSuffix();
 
     private static String getFileSuffix() {
-        try{
+        try {
             String lang = System.getenv("refmachine_lang");
-            if(lang != null){
+            if (lang != null) {
                 return lang;
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
         return "py";
     }
@@ -45,9 +48,9 @@ public class Utils {
     @NotNull
     public static <T> T[] toArrayNoPolymorphism(List<T> elements) {
         // Assumes the first element in the list is of type T.
-        if(elements.isEmpty()){
+        if (elements.isEmpty()) {
             return (T[]) new Object[0];
-        }else{
+        } else {
             T[] names = (T[]) Array.newInstance(
                     elements.get(0).getClass(), elements.size());
             return elements.toArray(names);
@@ -57,9 +60,9 @@ public class Utils {
 
     // TODO(bugabuga): figure out how it works with Chinese.
     public static String readFileContent(String path) throws IOException {
-        if(new File(path).exists()){
+        if (new File(path).exists()) {
             return new String(Files.readAllBytes(Paths.get(path)));
-        }else{
+        } else {
             return "";
         }
     }
@@ -88,17 +91,17 @@ public class Utils {
     }
 
     public static <T> Iterable<T> itemsAfter(List<T> elements, int index) {
-        if(index + 1 < elements.size()) {
+        if (index + 1 < elements.size()) {
             return elements.subList(index + 1, elements.size());
-        }else{
+        } else {
             return Arrays.asList();
         }
     }
 
     public static <T> Iterable<T> itemsBefore(List<T> elements, int index) {
-        if(index > 0) {
+        if (index > 0) {
             return elements.subList(0, index);
-        }else{
+        } else {
             return Arrays.asList();
         }
     }
@@ -107,7 +110,7 @@ public class Utils {
     @NotNull
     public static String getContentByLanguage(String suffix) {
         String newContent2 = "import re\n\n\ndef foo():\n    return re.compile('a')";
-        if(suffix.equals("java")){
+        if (suffix.equals("java")) {
             newContent2 = "class A{\n    void foo(){}\n}";
         }
         return newContent2;
@@ -124,21 +127,6 @@ public class Utils {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    public static org.json.simple.JSONObject createFileMessage(
-            String relativePath, String content) {
-        JSONObject expected = new JSONObject();
-        expected.put("command", "uploadFile");
-        expected.put("relativePath", Utils.toBase64(relativePath));
-        expected.put("content", Utils.toBase64(content));
-        return expected;
-    }
-
-    public static org.json.simple.JSONObject createCommandMessage(String command) {
-            JSONObject expected = new JSONObject();
-            expected.put("command", command);
-            return expected;
-    }
-
     public static String fromBase64(String encodedString) {
         byte[] bytes = java.util.Base64.getDecoder().decode(encodedString);
         return new String(bytes, StandardCharsets.UTF_8);
@@ -146,7 +134,7 @@ public class Utils {
 
     public static List<String> asStringList(JSONArray jArray) {
         List<String> res = new ArrayList<>();
-        for (int i = 0; i < jArray.size(); i++){
+        for (int i = 0; i < jArray.size(); i++) {
             res.add((String) jArray.get(i));
         }
         return res;
@@ -161,5 +149,26 @@ public class Utils {
     public static String readResource(String resource) throws IOException {
         ClassLoader loader = Utils.class.getClassLoader();
         return readFileContent(Objects.requireNonNull(loader.getResource(resource)).getPath());
+    }
+
+    public static void invokeInDispatchThread(Runnable runnable) {
+        Application ideaApp = ApplicationManager.getApplication();
+        if (ideaApp != null) {
+            if (ideaApp.isDispatchThread()) {
+                runnable.run();
+            } else {
+                System.out.println("invoking later with IDEA");
+                ideaApp.invokeLater(runnable);
+            }
+        } else {
+            System.out.println("invoking later with Swing");
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    public static <T> JSONArray jsonArrayFromList(List<T> items) {
+        JSONArray res = new JSONArray();
+        res.addAll(items);
+        return res;
     }
 }
