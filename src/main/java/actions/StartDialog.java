@@ -1,6 +1,8 @@
 package actions;
 
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -13,6 +15,7 @@ public class StartDialog extends DialogWrapper {
     public StartDialog() {
         super(true); // use current window as parent
         init();
+        setOKActionEnabled(false);
         setTitle("Test DialogWrapper");
     }
 
@@ -37,4 +40,9 @@ public class StartDialog extends DialogWrapper {
             progressBar.setValue((int)(100 * percent));
         }
     }
+
+    public void enableDone() {
+        setOKActionEnabled(true);
+    }
+
 }

@@ -1,32 +1,41 @@
 package actions;
 
 import sender.Sender;
+import util.FilesFinder;
 import util.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FilesSender implements Runnable{
+public class FilesSender implements Runnable {
     private final String root;
     private final Sender sender;
+    private final FilesFinder finder;
+    private Consumer<String> errorCallback;
     private boolean aborted = false;
     private Consumer<Double> update;
-    private String suffix;
+    private Runnable doneCallback;
 
-    public FilesSender(Sender sender, String root, String suffix) {
+    public FilesSender(Sender sender, String root, FilesFinder finder) {
         this.sender = sender;
         this.root = root;
-        this.suffix = suffix;
+        this.finder = finder;
     }
 
     @Override
     public void run() {
-        List<String> filesToUpload = findAllFiles(root, suffix);
+        List<String> filesToUpload;
+        try {
+            filesToUpload = finder.findAllFiles(root);
+        } catch (IOException e) {
+            errorCallback.accept(Arrays.toString(e.getStackTrace()));
+            return;
+        }
         sender.sendMessage(Utils.createCommandMessage("resetFiles"));
-        for(int i = 0; i < filesToUpload.size(); ++i){
-            if(aborted){
+        for (int i = 0; i < filesToUpload.size(); ++i) {
+            if (aborted) {
                 sender.sendMessage(Utils.createCommandMessage("abort"));
                 return;
             }
@@ -39,25 +48,35 @@ public class FilesSender implements Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            updateProgress(i / (double)filesToUpload.size());
+            updateProgress(i / (double) filesToUpload.size());
         }
         sender.sendMessage(Utils.createCommandMessage("done"));
         updateProgress(1.0);
+        done();
     }
 
-
-    private List<String> findAllFiles(String root, String suffix) {
-        return new ArrayList<>();
+    private void done() {
+        if (doneCallback != null) {
+            doneCallback.run();
+        }
     }
 
-    private void updateProgress(double percent){
-        if(update != null) {
+    private void updateProgress(double percent) {
+        if (update != null) {
             update.accept(percent);
         }
     }
 
     public void setUpdateFunc(Consumer<Double> updateProcessBar) {
         this.update = updateProcessBar;
+    }
+
+    public void setErrorCallback(Consumer<String> errorCallback){
+        this.errorCallback = errorCallback;
+    }
+
+    public void setDoneFunc(Runnable doneCallback) {
+        this.doneCallback = doneCallback;
     }
 
     public void abort() {

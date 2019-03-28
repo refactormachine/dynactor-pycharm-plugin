@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import sender.Sender;
 import sender.TestWithServerMock;
+import util.FilesFinder;
 import util.Utils;
 
 import java.io.File;
@@ -16,7 +17,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FilesSenderTest extends TestWithServerMock {
 
@@ -62,7 +65,13 @@ public class FilesSenderTest extends TestWithServerMock {
 
         Sender sender = createSender();
         FilesSender filesSender = new FilesSender(sender, tempDir.getAbsolutePath(),
-                ".py");
+                new FilesFinder() {
+                    @Override
+                    public List<String> findAllFiles(String root) throws IOException {
+                        List<String> x = filesSpec.keySet().stream().filter(s -> !s.equals("do_not_send_me")).collect(Collectors.toList());
+                        return x;
+                    }
+                });
         filesSender.run();
 
         assertFilesSent(filesSpec);

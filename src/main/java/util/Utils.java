@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Utils {
     public static final String FILE_SUFFIX = getFileSuffix();
@@ -61,9 +63,14 @@ public class Utils {
         }
     }
 
+    public static void writeFile(File file, String content) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter(file, "UTF-8");
+        writer.print(content);
+        writer.close();
+    }
+
     public static void writeFile(String filepath, String content) throws FileNotFoundException, UnsupportedEncodingException {
         new File(filepath).getParentFile().mkdirs();
-        System.out.println("filepath = " + filepath);
         PrintWriter writer = new PrintWriter(filepath, "UTF-8");
         writer.print(content);
         writer.close();
@@ -134,5 +141,24 @@ public class Utils {
     public static String fromBase64(String encodedString) {
         byte[] bytes = java.util.Base64.getDecoder().decode(encodedString);
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    public static List<String> asStringList(JSONArray jArray) {
+        List<String> res = new ArrayList<>();
+        for (int i = 0; i < jArray.size(); i++){
+            res.add((String) jArray.get(i));
+        }
+        return res;
+    }
+
+    public static <T> List<T> joinLists(List<T> l1, List<T> l2) {
+        ArrayList<T> res = new ArrayList<T>(l1);
+        res.addAll(l2);
+        return res;
+    }
+
+    public static String readResource(String resource) throws IOException {
+        ClassLoader loader = Utils.class.getClassLoader();
+        return readFileContent(Objects.requireNonNull(loader.getResource(resource)).getPath());
     }
 }
